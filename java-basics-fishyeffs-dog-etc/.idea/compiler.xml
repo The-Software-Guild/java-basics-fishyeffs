@@ -6,11 +6,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="rockPaperScissors" />
+        <module name="Dog" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="java-basics-fishyeffs" target="11" />
-    </bytecodeTargetLevel>
   </component>
 </project>
