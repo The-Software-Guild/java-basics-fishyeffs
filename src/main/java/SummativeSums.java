@@ -13,7 +13,6 @@ public class SummativeSums {
         arrays.add(arr2);
         arrays.add(arr3);
 
-
         int i = 0;
         for (int[] arr : arrays) {
             i++;
