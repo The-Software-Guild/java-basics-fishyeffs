@@ -1,3 +1,5 @@
+package com.mthree.nick.basics;
+
 import java.util.ArrayList;
 
 public class SummativeSums {

@@ -1,3 +1,5 @@
+package com.mthree.nick.basics;
+
 import java.util.Scanner;
 
 public class HealthyHearts {

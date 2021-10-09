@@ -1,4 +1,5 @@
-import java.util.Random;
+package com.mthree.nick.basics;
+
 import java.util.Scanner;
 
 public class GameMain {
