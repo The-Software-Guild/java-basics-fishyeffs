@@ -21,8 +21,8 @@ public class View {
                 System.out.println("1 - list");
                 System.out.println("2 - find by title");
                 System.out.println("3 - display singular dvd");
-                System.out.println("4 - load from file --not working");
-                System.out.println("5 - save to file --not working");
+                System.out.println("4 - load from file");
+                System.out.println("5 - save to file");
                 System.out.println("6 - insert");
                 System.out.println("7 - update");
                 System.out.println("8 - delete");

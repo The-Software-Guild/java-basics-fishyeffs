@@ -9,7 +9,7 @@ public interface DVD_DAO {
     HashMap<String, DVD_DTO> list();
     DVD_DTO findByTitle(String title);
     void displayInformation(String title);
-    HashMap<String, DVD_DTO> loadFromFile();
+    void loadFromFile();
     void saveToFile();
     boolean insertDVD(String title);
     boolean updateDVD(String title);

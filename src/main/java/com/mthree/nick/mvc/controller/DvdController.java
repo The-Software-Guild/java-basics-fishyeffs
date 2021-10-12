@@ -3,6 +3,7 @@ package com.mthree.nick.mvc.controller;
 import com.mthree.nick.mvc.dao.DVD_DAO;
 import com.mthree.nick.mvc.dto.DVD_DTO;
 
+import java.io.*;
 import java.util.*;
 
 public class DvdController implements DVD_DAO {
@@ -10,7 +11,8 @@ public class DvdController implements DVD_DAO {
     //remove
     //edit
     //list
-    HashMap<String, DVD_DTO> DVDs = new HashMap<String, DVD_DTO>();
+    private final String FILENAME = "dvd.txt";
+    private HashMap<String, DVD_DTO> DVDs = new HashMap<String, DVD_DTO>();
 
     public DvdController(HashMap<String, DVD_DTO> DVDs) {
         this.DVDs = DVDs;
@@ -18,6 +20,9 @@ public class DvdController implements DVD_DAO {
 
     @Override
     public HashMap<String, DVD_DTO> list() {
+        if (DVDs.size() == 0) {
+            System.out.println("No titles exist in the list.");
+        }
         for (String i: DVDs.keySet()) {
             System.out.println(i + "   -   " + DVDs.get(i).getSTUDIO());
         }
@@ -46,13 +51,78 @@ public class DvdController implements DVD_DAO {
     }
 
     @Override
-    public HashMap<String, DVD_DTO> loadFromFile() {
-        return null;
+    public void loadFromFile() {
+        try {
+            Scanner sc = new Scanner(new BufferedReader(new FileReader(FILENAME)));
+            while (sc.hasNextLine()) {
+                //String line = sc.nextLine();
+                DVD_DTO dvdTemp = unmarshall(sc);
+                this.DVDs.put(dvdTemp.getTITLE(), dvdTemp);
+            }
+            System.out.println("Written " + this.DVDs.size() + " DVD(s) from " + FILENAME);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private DVD_DTO unmarshall(Scanner line) {
+        String title, relDate,mpaa,dir,studio,uNote;
+        line.useDelimiter(",|\\R");
+        double uRating;
+        try {
+            title = line.next();
+            relDate = line.next();
+            mpaa = line.next();
+            dir = line.next();
+            studio = line.next();
+            uRating = line.nextDouble();
+            uNote = line.next();
+            return new DVD_DTO(title, relDate, mpaa, dir, studio , uRating, uNote);
+        }
+        catch (InputMismatchException e) {
+            System.out.println("Invalid file format.");
+            return null;
+        }
     }
 
     @Override
     public void saveToFile() {
+        try {
+            PrintWriter out = new PrintWriter(new FileWriter(FILENAME));
+            String [] contents = new String[DVDs.size()];
+            int j = 0;
+            for (String i : DVDs.keySet()) {
+                contents[j] = marshallData(DVDs.get(i));
+                j++;
+            }
+            for (int i = contents.length - 1; i >= 0; i--) {
+                if (i == 0) {
+                    out.print(contents[i]);
+                }
+                else {
+                    out.println(contents[i]);
+                }
+            }
+            out.flush();
+            out.close();
+            System.out.println("Written " + DVDs.size() + " DVD(s) to " + FILENAME);
+            this.DVDs.clear();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+    }
+
+    private String marshallData(DVD_DTO dvd) {
+        String data = dvd.getTITLE() + ",";
+        data += dvd.getRELEASE_DATE() + ",";
+        data += dvd.getRatingMPAA() + ",";
+        data += dvd.getDIRECTOR() + ",";
+        data += dvd.getSTUDIO() + ",";
+        data += dvd.getUserRating() + ",";
+        data += dvd.getUserNote();
+        //ddmmyyyy,rating,dir,studio,13.3,note
+        return data;
     }
 
     @Override
@@ -65,9 +135,10 @@ public class DvdController implements DVD_DAO {
         double rating = 0;
         line.useDelimiter(",");
         line.useDelimiter(",|\\R");
-        Scanner input = line;
+        Scanner input;
         for (int i = 0; i < 6; i++) {
             do {
+                input = line;
                 valid = false;
                 try {
                     switch (i){
@@ -99,6 +170,10 @@ public class DvdController implements DVD_DAO {
                 }
                 catch (InputMismatchException e ) {
                     System.out.println("Input valid value.");
+                    valid = false;
+                    System.out.println("Please input the MPAA and review values, " +
+                            "each on a new line.");
+                    line = new Scanner(System.in);
                 }
             } while (!valid);
         }
@@ -124,13 +199,13 @@ public class DvdController implements DVD_DAO {
         do {
             try {
                 choice = in.nextInt();
-                if (choice <= 3 & choice >= 1) {
+                if (choice <= 3 && choice >= 1) {
                     isValid = true;
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Please input a valid number");
             }
-        } while (isValid);
+        } while (!isValid);
 
         isValid = false;
         String mpaa;
@@ -145,6 +220,7 @@ public class DvdController implements DVD_DAO {
                     case 1:
                         mpaa = in.next();
                         dvd.setRatingMPAA(mpaa);
+                        isValid = true;
                         break;
                     case 2:
                         rating = in.nextDouble();
@@ -160,7 +236,7 @@ public class DvdController implements DVD_DAO {
             } catch (InputMismatchException e) {
                 System.out.println("Please input a valid value.");
             }
-        } while (isValid);
+        } while (!isValid);
 
         System.out.println("Commit changes? (y/n - case sensitive)");
         String yOrN = in.next();
@@ -180,9 +256,8 @@ public class DvdController implements DVD_DAO {
     @Override
     public boolean deleteDVD(String title) {
         try {
-            DVD_DTO dvd = findByTitle(title);
-            DVDs.remove(dvd);
-            System.out.println("\'" + dvd.getTITLE() + "\' has been removed.");
+            DVDs.remove(title);
+            System.out.println("\'" + title + "\' has been removed.");
             return true;
         } catch (NullPointerException e) {
             System.out.println(title + " was not in the collection.");
