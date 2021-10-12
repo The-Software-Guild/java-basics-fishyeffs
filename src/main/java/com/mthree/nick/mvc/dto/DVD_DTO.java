@@ -1,4 +1,4 @@
-package com.mthree.nick.mvc.model;
+package com.mthree.nick.mvc.dto;
 
 public class DVD_DTO {
     private final String TITLE;
